@@ -427,7 +427,57 @@ function displayMedicines() {
 
 displayMedicines();
 
-</script>
+if ("Notification" in window) {
+  Notification.requestPermission();
+}
 
-</body>
-</html>
+setInterval(checkReminders, 30000);
+
+function checkReminders() {
+
+  if (Notification.permission !== "granted") {
+    return;
+  }
+
+  const now = new Date();
+
+  const currentTime =
+    now.getHours().toString().padStart(2, "0") +
+    ":" +
+    now.getMinutes().toString().padStart(2, "0");
+
+  const today =
+    now.toISOString().split("T")[0];
+
+  medicines.forEach(function(medicine) {
+
+    if (
+      medicine.time === currentTime &&
+      today >= medicine.startDate &&
+      today <= medicine.endDate &&
+      !medicine.taken
+    ) {
+
+      const notificationKey =
+        medicine.id + "-" + today + "-" + currentTime;
+
+      if (localStorage.getItem(notificationKey)) {
+        return;
+      }
+
+      new Notification("💊 Medicine Reminder", {
+        body:
+          medicine.name +
+          (medicine.dosage
+            ? " — " + medicine.dosage
+            : "") +
+          "\nTime to take your medicine."
+      });
+
+      localStorage.setItem(notificationKey, "sent");
+
+    }
+
+  });
+
+}
