@@ -1523,3 +1523,155 @@ function displayTodayMedicines() {
 
 
   list.innerHTM
+ todayMedicines
+
+.sort(function(a,b) {
+
+return a.time.localeCompare(
+
+b.time
+
+})
+
+.forEach(
+
+function(medicine) {
+
+const today = getToday();
+
+const taken =
+
+medicine.takenDates &&
+
+medicine.takenDates.includes(
+
+today
+
+const div =
+
+document.createElement(
+
+"div"
+
+div.className = "medicine"; 
+  div.innerHTML =
+
+<h3>
+
+${
+
+}
+
+taken
+
+?""
+
+)}
+
+${escapeHTML(
+
+medicine.name
+
+</h3>
+
+<p>
+
+<strong>Time:</strong>
+
+${medicine.time}
+
+</p>
+
+<p>
+
+${
+
+}
+
+? "Medicine taken today."
+
+: "Waiting for reminder."
+
+</p>
+  ;
+  list.appendChild(
+
+div
+
+);
+
+}
+
+);
+
+/*==
+
+SECURITY
+
+function escapeHTML(value) {
+
+return String (value)
+
+.replace(
+
+/&/g,
+
+"&amp;"
+
+)
+
+.replace(
+
+/</g,
+
+"&lt;"
+
+)
+
+.replace(
+
+/>/g,
+
+"&gt;"
+
+.replace(
+
+"&quot;"
+
+)
+
+.replace(
+
+"&#039;"
+);
+
+}
+START APP
+
+Code
+
+Preview
+
+displayMedicines();
+
+displayTodayMedicines();
+
+setInterval( checkReminders, 1000
+
+);
+
+setinterval(
+
+);
+
+checkSnoozedReminders,
+
+1000
+
+/* Check immediately */ checkReminders();
+
+</script>
+
+</body>
+
+</html>
