@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Medicine Reminder</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #0b0b0f;
+  color: white;
+  padding-bottom: 40px;
+}
+
+header {
+  padding: 25px 20px;
+  text-align: center;
+  background: #15151c;
+  border-bottom: 1px solid #292934;
+}
+
+header h1 {
+  color: #a970ff;
+  margin-bottom: 5px;
+}
+
+header p {
+  color: #aaaab4;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: #15151c;
+  border: 1px solid #292934;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  color: #ccc;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 13px;
+  border-radius: 8px;
+  border: 1px solid #3a3a45;
+  background: #0e0e13;
+  color: white;
+  font-size: 15px;
+}
+
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  background: #a970ff;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.medicine {
+  background: #0e0e13;
+  border: 1px solid #30303a;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 12px;
+}
+
+.medicine h3 {
+  color: #a970ff;
+  margin-bottom: 8px;
+}
+
+.medicine p {
+  color: #aaaab4;
+  margin: 4px 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.actions button {
+  margin: 0;
+  font-size: 14px;
+}
+
+.taken {
+  background: #247a4a;
+}
+
+.delete {
+  background: #9b3030;
+}
+
+.empty {
+  text-align: center;
+  color: #777780;
+  padding: 20px;
+}
+
+.status {
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background: #191922;
+  color: #aaaab4;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>💊 Medicine Reminder</h1>
+  <p>Keep track of your medicines</p>
+</header>
+
+<div class="container">
+
+  <div class="status" id="status">
+    No medicines added yet.
+  </div>
+
+  <div class="card">
+
+    <h2>➕ Add Medicine</h2>
+
+    <label>Medicine Name</label>
+    <input
+      type="text"
+      id="medicineName"
+      placeholder="Example: Paracetamol"
+    >
+
+    <label>Dosage</label>
+    <input
+      type="text"
+      id="dosage"
+      placeholder="Example: 500 mg"
+    >
+
+    <label>Time</label>
+    <input type="time" id="medicineTime">
+
+    <label>Start Date</label>
+    <input type="date" id="startDate">
+
+    <label>End Date</label>
+    <input type="date" id="endDate">
+
+    <label>Frequency</label>
+    <select id="frequency">
+      <option value="Daily">Daily</option>
+      <option value="Weekly">Weekly</option>
+    </select>
+
+    <button onclick="addMedicine()">
+      Add Medicine
+    </button>
+
+  </div>
+
+  <div class="card">
+
+    <h2>📋 My Medicines</h2>
+
+    <div id="medicineList">
+      <div class="empty">
+        No medicines added.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+let medicines = JSON.parse(
+  localStorage.getItem("medicines")
+) || [];
+
+function saveMedicines() {
+  localStorage.setItem(
+    "medicines",
+    JSON.stringify(medicines)
+  );
+}
+
+function addMedicine() {
+
+  const name =
+    document.getElementById("medicineName").value.trim();
+
+  const dosage =
+    document.getElementById("dosage").value.trim();
+
+  const time =
+    document.getElementById("medicineTime").value;
+
+  const startDate =
+    document.getElementById("startDate").value;
+
+  const endDate =
+    document.getElementById("endDate").value;
+
+  const frequency =
+    document.getElementById("frequency").value;
+
+  if (!name || !time || !startDate || !endDate) {
+
+    alert("Please fill in medicine name, time and dates.");
+
+    return;
+  }
+
+  const medicine = {
+
+    id: Date.now(),
+
+    name: name,
+
+    dosage: dosage,
+
+    time: time,
+
+    startDate: startDate,
+
+    endDate: endDate,
+
+    frequency: frequency,
+
+    taken: false
+
+  };
+
+  medicines.push(medicine);
+
+  saveMedicines();
+
+  clearForm();
+
+  displayMedicines();
+
+}
+
+function clearForm() {
+
+  document.getElementById("medicineName").value = "";
+
+  document.getElementById("dosage").value = "";
+
+  document.getElementById("medicineTime").value = "";
+
+  document.getElementById("startDate").value = "";
+
+  document.getElementById("endDate").value = "";
+
+}
+
+function markTaken(id) {
+
+  medicines = medicines.map(function(medicine) {
+
+    if (medicine.id === id) {
+
+      medicine.taken = !medicine.taken;
+
+    }
+
+    return medicine;
+
+  });
+
+  saveMedicines();
+
+  displayMedicines();
+
+}
+
+function deleteMedicine(id) {
+
+  if (!confirm("Delete this medicine?")) {
+    return;
+  }
+
+  medicines = medicines.filter(function(medicine) {
+
+    return medicine.id !== id;
+
+  });
+
+  saveMedicines();
+
+  displayMedicines();
+
+}
+
+function displayMedicines() {
+
+  const list =
+    document.getElementById("medicineList");
+
+  const status =
+    document.getElementById("status");
+
+  if (medicines.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">No medicines added.</div>';
+
+    status.innerText =
+      "No medicines added yet.";
+
+    return;
+
+  }
+
+  status.innerText =
+    medicines.length +
+    " medicine(s) scheduled.";
+
+  list.innerHTML = "";
+
+  medicines.forEach(function(medicine) {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "medicine";
+
+    div.innerHTML = `
+
+      <h3>💊 ${medicine.name}</h3>
+
+      <p>
+        <strong>Dosage:</strong>
+        ${medicine.dosage || "Not specified"}
+      </p>
+
+      <p>
+        <strong>Time:</strong>
+        ${medicine.time}
+      </p>
+
+      <p>
+        <strong>Period:</strong>
+        ${medicine.startDate}
+        → 
+        ${medicine.endDate}
+      </p>
+
+      <p>
+        <strong>Frequency:</strong>
+        ${medicine.frequency}
+      </p>
+
+      <p>
+        <strong>Status:</strong>
+        ${medicine.taken ? "✅ Taken" : "⏳ Pending"}
+      </p>
+
+      <div class="actions">
+
+        <button
+          class="taken"
+          onclick="markTaken(${medicine.id})">
+
+          ${medicine.taken
+            ? "Mark Pending"
+            : "Mark Taken"}
+
+        </button>
+
+        <button
+          class="delete"
+          onclick="deleteMedicine(${medicine.id})">
+
+          Delete
+
+        </button>
+
+      </div>
+
+    `;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+displayMedicines();
+
+</script>
+
+</body>
+</html>
